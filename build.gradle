@@ -2,43 +2,58 @@ buildscript {
     repositories {
         jcenter()
         maven { url = "http://files.minecraftforge.net/maven" }
+        maven { url = "http://repo.spongepowered.org/maven" }
     }
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
     }
 }
+
+apply plugin: 'java'
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-ext.configFile = file('build.properties')
+version = "${mc_version}-${major_version}.${minor_version}.${build_number}"
+group= "net.hdt.huskylib2"
+archivesBaseName = "HuskyLib2"
 
-configFile.withReader {
-    def prop = new Properties()
-    prop.load(it)
-    ext.config = new ConfigSlurper().parse prop
-}
-
-version = "${config.major_version}.${config.minor_version}.${config.build_number}"
-group= "net.thegaminghuskymc.huskylib"
-archivesBaseName = config.mod_name
-
-sourceCompatibility = targetCompatibility = "1.8"
+sourceCompatibility = targetCompatibility = '1.8'
 compileJava {
-    sourceCompatibility = targetCompatibility = "1.8"
+    sourceCompatibility = targetCompatibility = '1.8'
 }
 
 minecraft {
-    version = "1.12.2-14.23.2.2615"
+    version = "${mc_version}-${forge_version}"
     runDir = "run"
-    mappings = "snapshot_20180212"
+    mappings = "${mcp_mappings}"
+}
+
+configurations {
+    embed
+    implementation.extendsFrom(embed)
+}
+
+repositories {
+    maven { url = "http://dvs1.progwml6.com/files/maven" }
+    maven { url = "http://tehnut.info/maven" }
+    maven { url = "http://maven.tterrag.com" }
+}
+
+dependencies {
+    compile "mezz.jei:jei_${mc_version}:${jei_version}:api"
+    compile "mcp.mobius.waila:Hwyla:${hwyla_version}:api"
+    runtime "mezz.jei:jei_${mc_version}:${jei_version}"
+    runtime "mcp.mobius.waila:Hwyla:${hwyla_version}"
 }
 
 processResources {
     inputs.property "version", project.version
     inputs.property "mcversion", project.minecraft.version
+
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'
         expand 'version':project.version, 'mcversion':project.minecraft.version
     }
+
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
     }

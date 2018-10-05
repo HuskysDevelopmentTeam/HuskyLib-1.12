@@ -6,7 +6,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public interface IStateMapperProvider {
 
-	@SideOnly(Side.CLIENT)
-	public IStateMapper getStateMapper();
+    @SideOnly(Side.CLIENT)
+    public IStateMapper getStateMapper();
 
 }

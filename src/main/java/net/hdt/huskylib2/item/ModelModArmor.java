@@ -16,75 +16,75 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public abstract class ModelModArmor extends ModelBiped {
 
-	public abstract void setModelParts();
+    public abstract void setModelParts();
 
-	@Override
-	public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5) {
-		setModelParts();
+    @Override
+    public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5) {
+        setModelParts();
 
-		GlStateManager.pushMatrix();
-		if(entity instanceof EntityArmorStand) { // Fixes rendering on armor stands
-			f3 = 0;
-			GlStateManager.translate(0F, 0.15F, 0F);
-		}
+        GlStateManager.pushMatrix();
+        if (entity instanceof EntityArmorStand) { // Fixes rendering on armor stands
+            f3 = 0;
+            GlStateManager.translate(0F, 0.15F, 0F);
+        }
 
-		prepareForRender(entity, f5);
-		super.render(entity, f, f1, f2, f3, f4, f5);
-		GlStateManager.popMatrix();
-	}
+        prepareForRender(entity, f5);
+        super.render(entity, f, f1, f2, f3, f4, f5);
+        GlStateManager.popMatrix();
+    }
 
-	public void prepareForRender(Entity entity, float pticks) {
-		EntityLivingBase living = (EntityLivingBase) entity;
-		isSneak = living != null ? living.isSneaking() : false;
-		isChild = living != null ? living.isChild() : false;
-		if(living != null && living instanceof EntityPlayer) {
-			EntityPlayer player = (EntityPlayer) living;
+    public void prepareForRender(Entity entity, float pticks) {
+        EntityLivingBase living = (EntityLivingBase) entity;
+        isSneak = living != null ? living.isSneaking() : false;
+        isChild = living != null ? living.isChild() : false;
+        if (living != null && living instanceof EntityPlayer) {
+            EntityPlayer player = (EntityPlayer) living;
 
-			swingProgress = player.getSwingProgress(pticks);
+            swingProgress = player.getSwingProgress(pticks);
 
-			ArmPose modelbiped$armpose = ArmPose.EMPTY;
-			ArmPose modelbiped$armpose1 = ArmPose.EMPTY;
-			ItemStack itemstack = player.getHeldItemMainhand();
-			ItemStack itemstack1 = player.getHeldItemOffhand();
+            ArmPose modelbiped$armpose = ArmPose.EMPTY;
+            ArmPose modelbiped$armpose1 = ArmPose.EMPTY;
+            ItemStack itemstack = player.getHeldItemMainhand();
+            ItemStack itemstack1 = player.getHeldItemOffhand();
 
-			if(!itemstack.isEmpty()) {
-				modelbiped$armpose = ArmPose.ITEM;
+            if (!itemstack.isEmpty()) {
+                modelbiped$armpose = ArmPose.ITEM;
 
-				if(player.getItemInUseCount() > 0) {
-					EnumAction enumaction = itemstack.getItemUseAction();
+                if (player.getItemInUseCount() > 0) {
+                    EnumAction enumaction = itemstack.getItemUseAction();
 
-					if(enumaction == EnumAction.BLOCK)
-						modelbiped$armpose = ArmPose.BLOCK;
-					else if(enumaction == EnumAction.BOW)
-						modelbiped$armpose = ArmPose.BOW_AND_ARROW;
-				}
-			}
+                    if (enumaction == EnumAction.BLOCK)
+                        modelbiped$armpose = ArmPose.BLOCK;
+                    else if (enumaction == EnumAction.BOW)
+                        modelbiped$armpose = ArmPose.BOW_AND_ARROW;
+                }
+            }
 
-			if(!itemstack1.isEmpty()) {
-				modelbiped$armpose1 = ArmPose.ITEM;
+            if (!itemstack1.isEmpty()) {
+                modelbiped$armpose1 = ArmPose.ITEM;
 
-				if(player.getItemInUseCount() > 0) {
-					EnumAction enumaction1 = itemstack1.getItemUseAction();
+                if (player.getItemInUseCount() > 0) {
+                    EnumAction enumaction1 = itemstack1.getItemUseAction();
 
-					if(enumaction1 == EnumAction.BLOCK)
-						modelbiped$armpose1 = ArmPose.BLOCK;
-				}
-			}
+                    if (enumaction1 == EnumAction.BLOCK)
+                        modelbiped$armpose1 = ArmPose.BLOCK;
+                }
+            }
 
-			if(player.getPrimaryHand() == EnumHandSide.RIGHT) {
-				rightArmPose = modelbiped$armpose;
-				leftArmPose = modelbiped$armpose1;
-			} else {
-				rightArmPose = modelbiped$armpose1;
-				leftArmPose = modelbiped$armpose;
-			}
-		}
-	}
+            if (player.getPrimaryHand() == EnumHandSide.RIGHT) {
+                rightArmPose = modelbiped$armpose;
+                leftArmPose = modelbiped$armpose1;
+            } else {
+                rightArmPose = modelbiped$armpose1;
+                leftArmPose = modelbiped$armpose;
+            }
+        }
+    }
 
-	public void setRotateAngle(ModelRenderer modelRenderer, float x, float y, float z) {
-		modelRenderer.rotateAngleX = x;
-		modelRenderer.rotateAngleY = y;
-		modelRenderer.rotateAngleZ = z;
-	}
+    public void setRotateAngle(ModelRenderer modelRenderer, float x, float y, float z) {
+        modelRenderer.rotateAngleX = x;
+        modelRenderer.rotateAngleY = y;
+        modelRenderer.rotateAngleZ = z;
+    }
 
 }

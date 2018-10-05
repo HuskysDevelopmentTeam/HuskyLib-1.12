@@ -11,45 +11,45 @@ import java.util.List;
 
 public class MultiRecipe extends ModRecipe {
 
-	private List<IRecipe> subRecipes = new LinkedList<>();
-	IRecipe matched;
-	
-	public MultiRecipe(ResourceLocation res) {
-		super(res);
-	}
-	
-	public void addRecipe(IRecipe recipe) {
-		subRecipes.add(recipe);
-	}
+    IRecipe matched;
+    private List<IRecipe> subRecipes = new LinkedList<>();
 
-	@Override
-	public boolean matches(InventoryCrafting inv, World worldIn) {
-		matched = null;
-		for(IRecipe recipe : subRecipes)
-			if(recipe.matches(inv, worldIn)) {
-				matched = recipe;
-				return true;
-			}
-		
-		return false;
-	}
+    public MultiRecipe(ResourceLocation res) {
+        super(res);
+    }
 
-	@Override
-	public ItemStack getCraftingResult(InventoryCrafting inv) {
-		if(matched == null)
-			return ItemStack.EMPTY;
-		
-		return matched.getCraftingResult(inv);
-	}
+    public void addRecipe(IRecipe recipe) {
+        subRecipes.add(recipe);
+    }
 
-	@Override
-	public boolean canFit(int width, int height) {
-		return false;
-	}
+    @Override
+    public boolean matches(InventoryCrafting inv, World worldIn) {
+        matched = null;
+        for (IRecipe recipe : subRecipes)
+            if (recipe.matches(inv, worldIn)) {
+                matched = recipe;
+                return true;
+            }
 
-	@Override
-	public ItemStack getRecipeOutput() {
-		return ItemStack.EMPTY;
-	}
+        return false;
+    }
+
+    @Override
+    public ItemStack getCraftingResult(InventoryCrafting inv) {
+        if (matched == null)
+            return ItemStack.EMPTY;
+
+        return matched.getCraftingResult(inv);
+    }
+
+    @Override
+    public boolean canFit(int width, int height) {
+        return false;
+    }
+
+    @Override
+    public ItemStack getRecipeOutput() {
+        return ItemStack.EMPTY;
+    }
 
 }

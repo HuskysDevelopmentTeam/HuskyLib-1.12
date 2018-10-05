@@ -17,76 +17,76 @@ import java.util.List;
 
 public abstract class ItemMod extends Item implements IVariantHolder {
 
-	public static final List<IVariantHolder> variantHolders = new ArrayList<>();
+    public static final List<IVariantHolder> variantHolders = new ArrayList<>();
 
-	private final String[] variants;
-	private final String bareName;
+    private final String[] variants;
+    private final String bareName;
 
-	public ItemMod(String name, String... variants) {
-		setTranslationKey(name);
-		if(variants.length > 1)
-			setHasSubtypes(true);
+    public ItemMod(String name, String... variants) {
+        setTranslationKey(name);
+        if (variants.length > 1)
+            setHasSubtypes(true);
 
-		if(variants.length == 0)
-			variants = new String[] { name };
+        if (variants.length == 0)
+            variants = new String[]{name};
 
-		bareName = name;
-		this.variants = variants;
-		variantHolders.add(this);
-	}
+        bareName = name;
+        this.variants = variants;
+        variantHolders.add(this);
+    }
 
-	@Override
-	public Item setTranslationKey(String name) {
-		super.setTranslationKey(name);
-		setRegistryName(new ResourceLocation(getPrefix() + name));
-		ProxyRegistry.register(this);
+    @SideOnly(Side.CLIENT)
+    public static void tooltipIfShift(List<String> tooltip, Runnable r) {
+        TooltipHandler.tooltipIfShift(tooltip, r);
+    }
 
-		return this;
-	}
+    @SideOnly(Side.CLIENT)
+    public static void addToTooltip(List<String> tooltip, String s, Object... format) {
+        TooltipHandler.addToTooltip(tooltip, s, format);
+    }
 
-	@Override
-	public String getTranslationKey(ItemStack par1ItemStack) {
-		int dmg = par1ItemStack.getItemDamage();
-		String[] variants = getVariants();
+    @SideOnly(Side.CLIENT)
+    public static String local(String s) {
+        return TooltipHandler.local(s);
+    }
 
-		String name;
-		if(dmg >= variants.length)
-			name = bareName;
-		else name = variants[dmg];
+    @Override
+    public Item setTranslationKey(String name) {
+        super.setTranslationKey(name);
+        setRegistryName(new ResourceLocation(getPrefix() + name));
+        ProxyRegistry.register(this);
 
-		return "item." + getPrefix() + name;
-	}
+        return this;
+    }
 
-	@Override
-	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
-		if(isInCreativeTab(tab))
-			for(int i = 0; i < getVariants().length; i++)
-				subItems.add(new ItemStack(this, 1, i));
-	}
+    @Override
+    public String getTranslationKey(ItemStack par1ItemStack) {
+        int dmg = par1ItemStack.getItemDamage();
+        String[] variants = getVariants();
 
-	@Override
-	public String[] getVariants() {
-		return variants;
-	}
+        String name;
+        if (dmg >= variants.length)
+            name = bareName;
+        else name = variants[dmg];
 
-	@Override
-	public ItemMeshDefinition getCustomMeshDefinition() {
-		return null;
-	}
+        return "item." + getPrefix() + name;
+    }
 
-	@SideOnly(Side.CLIENT)
-	public static void tooltipIfShift(List<String> tooltip, Runnable r) {
-		TooltipHandler.tooltipIfShift(tooltip, r);
-	}
+    @Override
+    public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
+        if (isInCreativeTab(tab))
+            for (int i = 0; i < getVariants().length; i++)
+                subItems.add(new ItemStack(this, 1, i));
+    }
 
-	@SideOnly(Side.CLIENT)
-	public static void addToTooltip(List<String> tooltip, String s, Object... format) {
-		TooltipHandler.addToTooltip(tooltip, s, format);
-	}
+    @Override
+    public String[] getVariants() {
+        return variants;
+    }
 
-	@SideOnly(Side.CLIENT)
-	public static String local(String s) {
-		return TooltipHandler.local(s);
-	}
+    @Override
+    public ItemMeshDefinition getCustomMeshDefinition() {
+        return null;
+    }
 
 }

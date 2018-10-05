@@ -4,142 +4,153 @@ import net.hdt.huskylib2.interf.*;
 import net.hdt.huskylib2.item.ItemMod;
 import net.minecraft.block.Block;
 import net.minecraft.block.properties.IProperty;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemMeshDefinition;
 import net.minecraft.client.renderer.block.model.ModelBakery;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.block.statemap.IStateMapper;
 import net.minecraft.client.renderer.block.statemap.StateMap;
-import net.minecraft.client.renderer.color.BlockColors;
-import net.minecraft.client.renderer.color.ItemColors;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IStringSerializable;
+import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
 
 import java.util.HashMap;
+import java.util.Objects;
 
-public final class ModelHandler {
+import static net.hdt.huskylib2.HuskyLib.MOD_ID;
 
-	public static final HashMap<String, ModelResourceLocation> resourceLocations = new HashMap<>();
+@Mod.EventBusSubscriber(modid = MOD_ID, value = Side.CLIENT)
+public class ModelHandler {
 
-	@SubscribeEvent
-	public static void onRegister(ModelRegistryEvent event) {
-		for(IVariantHolder holder : ItemMod.variantHolders)
-			registerModels(holder);
-	}
+    private static final HashMap<String, ModelResourceLocation> resourceLocations = new HashMap<>();
 
-	public static void init() {
-		ItemColors itemColors = Minecraft.getMinecraft().getItemColors();
-		BlockColors blockColors = Minecraft.getMinecraft().getBlockColors();
+    @SubscribeEvent
+    public static void onRegister(ModelRegistryEvent event) {
+        for (IVariantHolder holder : ItemMod.variantHolders)
+            registerModels(holder);
+    }
 
-		for(IVariantHolder holder : ItemMod.variantHolders) {
-			if(holder instanceof IItemColorProvider)
-				itemColors.registerItemColorHandler(((IItemColorProvider) holder).getItemColor(), (Item) holder);
+    @SubscribeEvent
+    public static void onBlockColored(ColorHandlerEvent.Block event) {
+        for (IVariantHolder holder : ItemMod.variantHolders) {
+            if (holder instanceof ItemBlock && ((ItemBlock) holder).getBlock() instanceof IBlockColorProvider) {
+                Block block = ((ItemBlock) holder).getBlock();
+                event.getBlockColors().registerBlockColorHandler(((IBlockColorProvider) block).getBlockColor(), block);
+            }
+        }
+    }
 
-			if(holder instanceof ItemBlock && ((ItemBlock) holder).getBlock() instanceof IBlockColorProvider) {
-				Block block = ((ItemBlock) holder).getBlock();
-				blockColors.registerBlockColorHandler(((IBlockColorProvider) block).getBlockColor(), block);
-				itemColors.registerItemColorHandler(((IBlockColorProvider) block).getItemColor(), block);
-			}
-		}
-	}
+    @SubscribeEvent
+    public static void onItemColored(ColorHandlerEvent.Item event) {
+        for (IVariantHolder holder : ItemMod.variantHolders) {
+            if (holder instanceof IItemColorProvider)
+                event.getItemColors().registerItemColorHandler(((IItemColorProvider) holder).getItemColor(), (Item) holder);
 
-	public static void registerModels(IVariantHolder holder) {
-		String unique = holder.getUniqueModel();
-		String prefix = holder.getPrefix();
-		Item i = (Item) holder;
+            if (holder instanceof ItemBlock && ((ItemBlock) holder).getBlock() instanceof IBlockColorProvider) {
+                Block block = ((ItemBlock) holder).getBlock();
+                event.getItemColors().registerItemColorHandler(((IBlockColorProvider) block).getItemColor(), block);
+            }
+        }
+    }
 
-		ItemMeshDefinition def = holder.getCustomMeshDefinition();
-		if(def != null)
-			ModelLoader.setCustomMeshDefinition((Item) holder, def);
-		else registerModels(i, prefix, holder.getVariants(), unique, false);
+    private static void registerModels(IVariantHolder holder) {
+        String unique = holder.getUniqueModel();
+        String prefix = holder.getPrefix();
+        Item i = (Item) holder;
 
-		if(holder instanceof IExtraVariantHolder) {
-			IExtraVariantHolder extra = (IExtraVariantHolder) holder;
-			registerModels(i, prefix, extra.getExtraVariants(), unique, true);
-		}
-	}
+        ItemMeshDefinition def = holder.getCustomMeshDefinition();
+        if (def != null)
+            ModelLoader.setCustomMeshDefinition((Item) holder, def);
+        else registerModels(i, prefix, holder.getVariants(), unique, false);
 
-	public static void registerModels(Item item, String prefix, String[] variants, String uniqueVariant, boolean extra) {
-		if(item instanceof ItemBlock && ((ItemBlock) item).getBlock() instanceof IModBlock) {
-			IModBlock quarkBlock = (IModBlock) ((ItemBlock) item).getBlock();
-			Class clazz = quarkBlock.getVariantEnum();
+        if (holder instanceof IExtraVariantHolder) {
+            IExtraVariantHolder extra = (IExtraVariantHolder) holder;
+            registerModels(i, prefix, extra.getExtraVariants(), unique, true);
+        }
+    }
 
-			IProperty variantProp = quarkBlock.getVariantProp();
-			boolean ignoresVariant = false;
+    private static void registerModels(Item item, String prefix, String[] variants, String uniqueVariant, boolean extra) {
+        if (item instanceof ItemBlock && ((ItemBlock) item).getBlock() instanceof IModBlock) {
+            IModBlock quarkBlock = (IModBlock) ((ItemBlock) item).getBlock();
+            Class clazz = quarkBlock.getVariantEnum();
 
-			IStateMapper mapper = quarkBlock.getStateMapper();
-			IProperty[] ignored = quarkBlock.getIgnoredProperties();
-			if(mapper != null || ignored != null && ignored.length > 0) {
-				if(mapper != null)
-					ModelLoader.setCustomStateMapper((Block) quarkBlock, mapper);
-				else {
-					StateMap.Builder builder = new StateMap.Builder();
-					for(IProperty p : ignored) {
-						if(p == variantProp)
-							ignoresVariant = true;
-						builder.ignore(p);
-					}
+            IProperty variantProp = quarkBlock.getVariantProp();
+            boolean ignoresVariant = false;
 
-					ModelLoader.setCustomStateMapper((Block) quarkBlock, builder.build());
-				}
-			}
+            IStateMapper mapper = quarkBlock.getStateMapper();
+            IProperty[] ignored = quarkBlock.getIgnoredProperties();
+            if (mapper != null || ignored != null && ignored.length > 0) {
+                if (mapper != null)
+                    ModelLoader.setCustomStateMapper((Block) quarkBlock, mapper);
+                else {
+                    StateMap.Builder builder = new StateMap.Builder();
+                    for (IProperty p : ignored) {
+                        if (p == variantProp)
+                            ignoresVariant = true;
+                        builder.ignore(p);
+                    }
 
-			if(clazz != null && !ignoresVariant) {
-				registerVariantsDefaulted(item, (Block) quarkBlock, clazz, variantProp.getName());
-				return;
-			}
-		}
+                    ModelLoader.setCustomStateMapper((Block) quarkBlock, builder.build());
+                }
+            }
 
-		for(int i = 0; i < variants.length; i++) {
-			String var = variants[i];
-			if(!extra && uniqueVariant != null)
-				var = uniqueVariant;
+            if (clazz != null && !ignoresVariant) {
+                registerVariantsDefaulted(item, (Block) quarkBlock, clazz, variantProp.getName());
+                return;
+            }
+        }
 
-			String name = prefix + var;
-			ModelResourceLocation loc = new ModelResourceLocation(name, "inventory");
-			if(!extra) {
-				ModelLoader.setCustomModelResourceLocation(item, i, loc);
-				resourceLocations.put(getKey(item, i), loc);
-			} else {
-				ModelBakery.registerItemVariants(item, loc);
-				resourceLocations.put(variants[i], loc);
-			}
-		}
-	}
+        for (int i = 0; i < variants.length; i++) {
+            String var = variants[i];
+            if (!extra && uniqueVariant != null)
+                var = uniqueVariant;
 
-	private static <T extends Enum<T> & IStringSerializable> void registerVariantsDefaulted(Item item, Block b, Class<T> enumclazz, String variantHeader) {
-		String baseName = b.getRegistryName().toString();
-		for(T e : enumclazz.getEnumConstants()) {
-			String variantName = variantHeader + "=" + e.getName();
-			ModelResourceLocation loc = new ModelResourceLocation(baseName, variantName);
-			int i = e.ordinal();
-			ModelLoader.setCustomModelResourceLocation(item, i, loc);
-			resourceLocations.put(getKey(item, i), loc);
-		}
-	}
+            String name = prefix + var;
+            ModelResourceLocation loc = new ModelResourceLocation(name, "inventory");
+            if (!extra) {
+                ModelLoader.setCustomModelResourceLocation(item, i, loc);
+                resourceLocations.put(getKey(item, i), loc);
+            } else {
+                ModelBakery.registerItemVariants(item, loc);
+                resourceLocations.put(variants[i], loc);
+            }
+        }
+    }
 
-	public static ModelResourceLocation getModelLocation(ItemStack stack) {
-		if(!stack.isEmpty())
-			return null;
+    private static <T extends Enum<T> & IStringSerializable> void registerVariantsDefaulted(Item item, Block b, Class<T> enumClazz, String variantHeader) {
+        String baseName = Objects.requireNonNull(b.getRegistryName()).toString();
+        for (T e : enumClazz.getEnumConstants()) {
+            String variantName = variantHeader + "=" + e.getName();
+            ModelResourceLocation loc = new ModelResourceLocation(baseName, variantName);
+            int i = e.ordinal();
+            ModelLoader.setCustomModelResourceLocation(item, i, loc);
+            resourceLocations.put(getKey(item, i), loc);
+        }
+    }
 
-		return getModelLocation(stack.getItem(), stack.getItemDamage());
-	}
+    public static ModelResourceLocation getModelLocation(ItemStack stack) {
+        if (!stack.isEmpty())
+            return null;
 
-	public static ModelResourceLocation getModelLocation(Item item, int meta) {
-		String key = getKey(item, meta);
-		if(resourceLocations.containsKey(key))
-			return resourceLocations.get(key);
+        return getModelLocation(stack.getItem(), stack.getItemDamage());
+    }
 
-		return null;
-	}
+    public static ModelResourceLocation getModelLocation(Item item, int meta) {
+        String key = getKey(item, meta);
+        if (resourceLocations.containsKey(key))
+            return resourceLocations.get(key);
 
-	private static String getKey(Item item, int meta) {
-		return "i_" + item.getRegistryName() + "@" + meta;
-	}
+        return null;
+    }
+
+    private static String getKey(Item item, int meta) {
+        return "i_" + item.getRegistryName() + "@" + meta;
+    }
 
 }

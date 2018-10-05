@@ -17,83 +17,81 @@ import java.util.Locale;
 
 public abstract class BlockMetaVariants<T extends Enum<T> & IStringSerializable> extends BlockMod {
 
-	public static Class temporaryVariantsEnum; // This is a massive hack, but such is life with constructors
-	public static PropertyEnum temporaryVariantProp;
+    public static Class temporaryVariantsEnum; // This is a massive hack, but such is life with constructors
+    public static PropertyEnum temporaryVariantProp;
 
-	public final Class<T> variantsEnum;
-	public final PropertyEnum<T> variantProp;
+    public final Class<T> variantsEnum;
+    public final PropertyEnum<T> variantProp;
 
-	public BlockMetaVariants(String name, Material materialIn, Class<T> variantsEnum) {
-		super(name, materialIn, asVariantArray(variantsEnum));
+    public BlockMetaVariants(String name, Material materialIn, Class<T> variantsEnum) {
+        super(Builder.create(materialIn), name, asVariantArray(variantsEnum));
 
-		this.variantsEnum = variantsEnum;
-		this.variantProp = temporaryVariantProp;
-		setDefaultState(blockState.getBaseState().withProperty(variantProp, variantsEnum.getEnumConstants()[0]));
-		
-		setTranslationKey(name);
-	}
+        this.variantsEnum = variantsEnum;
+        this.variantProp = temporaryVariantProp;
+        setDefaultState(blockState.getBaseState().withProperty(variantProp, variantsEnum.getEnumConstants()[0]));
+    }
 
-	@Override
-	public boolean registerInConstruction() {
-		return false;
-	}
-	
-	@Override
-	public BlockStateContainer createBlockState() {
-		return new BlockStateContainer(this, temporaryVariantProp);
-	}
+    public static String[] asVariantArray(Class e) {
+        temporaryVariantsEnum = e;
+        temporaryVariantProp = PropertyEnum.create(IVariantEnumHolder.HEADER, e);
+        Enum[] values = (Enum[]) e.getEnumConstants();
+        String[] variants = new String[values.length];
 
-	@Override
-	public int getMetaFromState(IBlockState state) {
-		return ((Enum<T>) state.getValue(variantProp == null ? temporaryVariantProp : variantProp)).ordinal();
-	}
+        for (int i = 0; i < values.length; i++)
+            variants[i] = values[i].name().toLowerCase(Locale.ENGLISH);
+        return variants;
+    }
 
-	@Override
-	public IBlockState getStateFromMeta(int meta) {
-		if(meta >= variantsEnum.getEnumConstants().length)
-			meta = 0;
+    @Override
+    public boolean registerInConstruction() {
+        return false;
+    }
 
-		return getDefaultState().withProperty(variantProp, variantsEnum.getEnumConstants()[meta]);
-	}
+    @Override
+    public BlockStateContainer createBlockState() {
+        return new BlockStateContainer(this, temporaryVariantProp);
+    }
 
-	@Override
-	public int damageDropped(IBlockState state) {
-		return getMetaFromState(state);
-	}
+    @Override
+    public int getMetaFromState(IBlockState state) {
+        return ((Enum<T>) state.getValue(variantProp == null ? temporaryVariantProp : variantProp)).ordinal();
+    }
 
-	@Override
-	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
-		return new ItemStack(this, 1, getMetaFromState(world.getBlockState(pos)));
-	}
+    @Override
+    public IBlockState getStateFromMeta(int meta) {
+        if (meta >= variantsEnum.getEnumConstants().length)
+            meta = 0;
 
-	@Override
-	public Class<T> getVariantEnum() {
-		return variantsEnum;
-	}
+        return getDefaultState().withProperty(variantProp, variantsEnum.getEnumConstants()[meta]);
+    }
 
-	@Override
-	public IProperty getVariantProp() {
-		return variantProp;
-	}
+    @Override
+    public int damageDropped(IBlockState state) {
+        return getMetaFromState(state);
+    }
 
-	public static String[] asVariantArray(Class e) {
-		temporaryVariantsEnum = e;
-		temporaryVariantProp = PropertyEnum.create(IVariantEnumHolder.HEADER, e);
-		Enum[] values = (Enum[]) e.getEnumConstants();
-		String[] variants = new String[values.length];
+    @Override
+    public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
+        return new ItemStack(this, 1, getMetaFromState(world.getBlockState(pos)));
+    }
 
-		for(int i = 0; i < values.length; i++)
-			variants[i] = values[i].name().toLowerCase(Locale.ENGLISH);
-		return variants;
-	}
+    @Override
+    public Class<T> getVariantEnum() {
+        return variantsEnum;
+    }
 
-	public static interface EnumBase extends IStringSerializable {
+    @Override
+    public IProperty getVariantProp() {
+        return variantProp;
+    }
 
-		@Override
-		public default String getName() {
-			return ((Enum) this).name().toLowerCase(Locale.ENGLISH);
-		}
+    public interface EnumBase extends IStringSerializable {
 
-	}
+        @Override
+        default String getName() {
+            return ((Enum) this).name().toLowerCase(Locale.ENGLISH);
+        }
+
+    }
 
 }

@@ -12,44 +12,44 @@ import java.util.Queue;
 
 public final class ClientTicker {
 
-	public static int ticksInGame = 0;
-	public static float partialTicks = 0;
-	public static float delta = 0;
-	public static float total = 0;
-	
-	private static Queue<Runnable> pendingActions = new ArrayDeque<>();
+    public static int ticksInGame = 0;
+    public static float partialTicks = 0;
+    public static float delta = 0;
+    public static float total = 0;
 
-	public static void addAction(Runnable action) {
-		pendingActions.add(action);
-	}
-	
-	private static void calcDelta() {
-		float oldTotal = total;
-		total = ticksInGame + partialTicks;
-		delta = total - oldTotal;
-	}
+    private static Queue<Runnable> pendingActions = new ArrayDeque<>();
 
-	@SubscribeEvent
-	public static void renderTick(RenderTickEvent event) {
-		if(event.phase == Phase.START)
-			partialTicks = event.renderTickTime;
-		else calcDelta();
-	}
+    public static void addAction(Runnable action) {
+        pendingActions.add(action);
+    }
 
-	@SubscribeEvent
-	public static void clientTickEnd(ClientTickEvent event) {
-		if(event.phase == Phase.END) {
-			GuiScreen gui = Minecraft.getMinecraft().currentScreen;
-			if(gui == null || !gui.doesGuiPauseGame()) {
-				ticksInGame++;
-				partialTicks = 0;
-			}
-			
-			while(!pendingActions.isEmpty())
-				pendingActions.poll().run();
+    private static void calcDelta() {
+        float oldTotal = total;
+        total = ticksInGame + partialTicks;
+        delta = total - oldTotal;
+    }
 
-			calcDelta();
-		}
-	}
+    @SubscribeEvent
+    public static void renderTick(RenderTickEvent event) {
+        if (event.phase == Phase.START)
+            partialTicks = event.renderTickTime;
+        else calcDelta();
+    }
+
+    @SubscribeEvent
+    public static void clientTickEnd(ClientTickEvent event) {
+        if (event.phase == Phase.END) {
+            GuiScreen gui = Minecraft.getMinecraft().currentScreen;
+            if (gui == null || !gui.doesGuiPauseGame()) {
+                ticksInGame++;
+                partialTicks = 0;
+            }
+
+            while (!pendingActions.isEmpty())
+                pendingActions.poll().run();
+
+            calcDelta();
+        }
+    }
 
 }

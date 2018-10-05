@@ -12,41 +12,41 @@ import net.minecraft.util.ResourceLocation;
 
 public abstract class ItemModArmor extends ItemArmor implements IVariantHolder {
 
-	private final String bareName;
+    private final String bareName;
 
-	public ItemModArmor(String name, ArmorMaterial materialIn, int renderIndexIn, EntityEquipmentSlot equipmentSlotIn) {
-		super(materialIn, renderIndexIn, equipmentSlotIn);
+    public ItemModArmor(String name, ArmorMaterial materialIn, int renderIndexIn, EntityEquipmentSlot equipmentSlotIn) {
+        super(materialIn, renderIndexIn, equipmentSlotIn);
 
-		setTranslationKey(name);
-		bareName = name;
-		ItemMod.variantHolders.add(this);
-		setCreativeTab(CreativeTabs.COMBAT);
-	}
+        setTranslationKey(name);
+        bareName = name;
+        ItemMod.variantHolders.add(this);
+        setCreativeTab(CreativeTabs.COMBAT);
+    }
 
-	@Override
-	public Item setTranslationKey(String name) {
-		super.setTranslationKey(name);
-		setRegistryName(new ResourceLocation(getPrefix() + name));
-		ProxyRegistry.register(this);
+    @Override
+    public Item setTranslationKey(String name) {
+        super.setTranslationKey(name);
+        setRegistryName(new ResourceLocation(getPrefix() + name));
+        ProxyRegistry.register(this);
 
-		return this;
-	}
+        return this;
+    }
 
-	@Override
-	public String getTranslationKey(ItemStack par1ItemStack) {
-		par1ItemStack.getItemDamage();
+    @Override
+    public String getTranslationKey(ItemStack par1ItemStack) {
+        par1ItemStack.getItemDamage();
 
-		return "item." + getPrefix() + bareName;
-	}
+        return "item." + getPrefix() + bareName;
+    }
 
-	@Override
-	public String[] getVariants() {
-		return new String[] { bareName };
-	}
+    @Override
+    public String[] getVariants() {
+        return new String[]{bareName};
+    }
 
-	@Override
-	public ItemMeshDefinition getCustomMeshDefinition() {
-		return null;
-	}
+    @Override
+    public ItemMeshDefinition getCustomMeshDefinition() {
+        return null;
+    }
 
 }

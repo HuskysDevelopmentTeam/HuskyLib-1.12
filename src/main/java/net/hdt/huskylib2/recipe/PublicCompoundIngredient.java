@@ -8,8 +8,8 @@ import java.util.Collection;
 // why is this constructor protected again? :thinking:
 public class PublicCompoundIngredient extends CompoundIngredient {
 
-	public PublicCompoundIngredient(Collection<Ingredient> children) {
-		super(children);
-	}
+    public PublicCompoundIngredient(Collection<Ingredient> children) {
+        super(children);
+    }
 
 }

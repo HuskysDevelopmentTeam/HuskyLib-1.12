@@ -42,7 +42,7 @@ public abstract class ItemModPickaxe extends ItemModTool {
     }
 
     public ItemModPickaxe(Item.ToolMaterial material, String name, String... variants) {
-        super(name,1.0F, -2.8F, material, EFFECTIVE_ON, variants);
+        super(name, 1.0F, -2.8F, material, EFFECTIVE_ON, variants);
     }
 
     public void addEfficiencyOn(Block block) {

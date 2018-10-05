@@ -10,53 +10,53 @@ import net.minecraft.util.ResourceLocation;
 
 public abstract class ItemModSword extends ItemSword implements IVariantHolder {
 
-	private final String[] variants;
-	private final String bareName;
+    private final String[] variants;
+    private final String bareName;
 
-	protected ItemModSword(String name, ToolMaterial material, String... variants) {
-		super(material);
-		setTranslationKey(name);
-		if(variants.length > 1)
-			setHasSubtypes(true);
+    protected ItemModSword(String name, ToolMaterial material, String... variants) {
+        super(material);
+        setTranslationKey(name);
+        if (variants.length > 1)
+            setHasSubtypes(true);
 
-		if(variants.length == 0)
-			variants = new String[] { name };
+        if (variants.length == 0)
+            variants = new String[]{name};
 
-		bareName = name;
-		this.variants = variants;
-		ItemMod.variantHolders.add(this);
-	}
+        bareName = name;
+        this.variants = variants;
+        ItemMod.variantHolders.add(this);
+    }
 
-	@Override
-	public Item setTranslationKey(String name) {
-		super.setTranslationKey(name);
-		setRegistryName(new ResourceLocation(getPrefix() + name));
-		ProxyRegistry.register(this);
+    @Override
+    public Item setTranslationKey(String name) {
+        super.setTranslationKey(name);
+        setRegistryName(new ResourceLocation(getPrefix() + name));
+        ProxyRegistry.register(this);
 
-		return this;
-	}
+        return this;
+    }
 
-	@Override
-	public String getTranslationKey(ItemStack par1ItemStack) {
-		int dmg = par1ItemStack.getItemDamage();
-		String[] variants = getVariants();
+    @Override
+    public String getTranslationKey(ItemStack par1ItemStack) {
+        int dmg = par1ItemStack.getItemDamage();
+        String[] variants = getVariants();
 
-		String name;
-		if(dmg >= variants.length)
-			name = bareName;
-		else name = variants[dmg];
+        String name;
+        if (dmg >= variants.length)
+            name = bareName;
+        else name = variants[dmg];
 
-		return "item." + getPrefix() + name;
-	}
+        return "item." + getPrefix() + name;
+    }
 
-	@Override
-	public String[] getVariants() {
-		return variants;
-	}
+    @Override
+    public String[] getVariants() {
+        return variants;
+    }
 
-	@Override
-	public ItemMeshDefinition getCustomMeshDefinition() {
-		return null;
-	}
+    @Override
+    public ItemMeshDefinition getCustomMeshDefinition() {
+        return null;
+    }
 
 }

@@ -6,19 +6,19 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public interface IVariantHolder {
 
-	public String[] getVariants();
+    String[] getVariants();
 
-	@SideOnly(Side.CLIENT)
-	public ItemMeshDefinition getCustomMeshDefinition();
+    @SideOnly(Side.CLIENT)
+    ItemMeshDefinition getCustomMeshDefinition();
 
-	public default String getUniqueModel() {
-		return null;
-	}
-	
-	public String getModNamespace();
+    default String getUniqueModel() {
+        return null;
+    }
 
-	public default String getPrefix() {
-		return getModNamespace() + ":";
-	}
+    String getModNamespace();
+
+    default String getPrefix() {
+        return getModNamespace() + ":";
+    }
 
 }

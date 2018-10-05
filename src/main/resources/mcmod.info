@@ -1,10 +1,10 @@
 [
   {
     "modid": "huskylib2",
-    "name": "HuskyLib 2",
+    "name": "HuskyLib-1.12.2",
     "description": "This is my lib mod which I use for my mods",
-    "version": "1.3.3",
-    "mcversion": "[1.12, 1.13]",
+    "version": "1.5.0",
+    "mcversion": "[1.12.2, 1.13]",
     "authorList": [
       "HuskyTheArtist"
     ]

@@ -29,220 +29,218 @@ import java.util.Random;
 
 public abstract class BlockModDust extends BlockMod implements IBlockColorProvider {
 
-	public static final PropertyEnum<EnumAttachPosition> NORTH = PropertyEnum.create("north", EnumAttachPosition.class);
-	public static final PropertyEnum<EnumAttachPosition> EAST = PropertyEnum.create("east", EnumAttachPosition.class);
-	public static final PropertyEnum<EnumAttachPosition> SOUTH = PropertyEnum.create("south", EnumAttachPosition.class);
-	public static final PropertyEnum<EnumAttachPosition> WEST = PropertyEnum.create("west", EnumAttachPosition.class);
+    public static final PropertyEnum<EnumAttachPosition> NORTH = PropertyEnum.create("north", EnumAttachPosition.class);
+    public static final PropertyEnum<EnumAttachPosition> EAST = PropertyEnum.create("east", EnumAttachPosition.class);
+    public static final PropertyEnum<EnumAttachPosition> SOUTH = PropertyEnum.create("south", EnumAttachPosition.class);
+    public static final PropertyEnum<EnumAttachPosition> WEST = PropertyEnum.create("west", EnumAttachPosition.class);
 
-	protected static final AxisAlignedBB[] WIRE_AABB = new AxisAlignedBB[] {
-			new AxisAlignedBB(0.1875D, 0.0D, 0.1875D, 0.8125D, 0.0625D, 0.8125D), 
-			new AxisAlignedBB(0.1875D, 0.0D, 0.1875D, 0.8125D, 0.0625D, 1.0D), 
-			new AxisAlignedBB(0.0D, 0.0D, 0.1875D, 0.8125D, 0.0625D, 0.8125D), 
-			new AxisAlignedBB(0.0D, 0.0D, 0.1875D, 0.8125D, 0.0625D, 1.0D), 
-			new AxisAlignedBB(0.1875D, 0.0D, 0.0D, 0.8125D, 0.0625D, 0.8125D), 
-			new AxisAlignedBB(0.1875D, 0.0D, 0.0D, 0.8125D, 0.0625D, 1.0D), 
-			new AxisAlignedBB(0.0D, 0.0D, 0.0D, 0.8125D, 0.0625D, 0.8125D), 
-			new AxisAlignedBB(0.0D, 0.0D, 0.0D, 0.8125D, 0.0625D, 1.0D), 
-			new AxisAlignedBB(0.1875D, 0.0D, 0.1875D, 1.0D, 0.0625D, 0.8125D), 
-			new AxisAlignedBB(0.1875D, 0.0D, 0.1875D, 1.0D, 0.0625D, 1.0D), 
-			new AxisAlignedBB(0.0D, 0.0D, 0.1875D, 1.0D, 0.0625D, 0.8125D), 
-			new AxisAlignedBB(0.0D, 0.0D, 0.1875D, 1.0D, 0.0625D, 1.0D), 
-			new AxisAlignedBB(0.1875D, 0.0D, 0.0D, 1.0D, 0.0625D, 0.8125D), 
-			new AxisAlignedBB(0.1875D, 0.0D, 0.0D, 1.0D, 0.0625D, 1.0D), 
-			new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 0.0625D, 0.8125D), 
-			new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 0.0625D, 1.0D) };
+    protected static final AxisAlignedBB[] WIRE_AABB = new AxisAlignedBB[]{
+            new AxisAlignedBB(0.1875D, 0.0D, 0.1875D, 0.8125D, 0.0625D, 0.8125D),
+            new AxisAlignedBB(0.1875D, 0.0D, 0.1875D, 0.8125D, 0.0625D, 1.0D),
+            new AxisAlignedBB(0.0D, 0.0D, 0.1875D, 0.8125D, 0.0625D, 0.8125D),
+            new AxisAlignedBB(0.0D, 0.0D, 0.1875D, 0.8125D, 0.0625D, 1.0D),
+            new AxisAlignedBB(0.1875D, 0.0D, 0.0D, 0.8125D, 0.0625D, 0.8125D),
+            new AxisAlignedBB(0.1875D, 0.0D, 0.0D, 0.8125D, 0.0625D, 1.0D),
+            new AxisAlignedBB(0.0D, 0.0D, 0.0D, 0.8125D, 0.0625D, 0.8125D),
+            new AxisAlignedBB(0.0D, 0.0D, 0.0D, 0.8125D, 0.0625D, 1.0D),
+            new AxisAlignedBB(0.1875D, 0.0D, 0.1875D, 1.0D, 0.0625D, 0.8125D),
+            new AxisAlignedBB(0.1875D, 0.0D, 0.1875D, 1.0D, 0.0625D, 1.0D),
+            new AxisAlignedBB(0.0D, 0.0D, 0.1875D, 1.0D, 0.0625D, 0.8125D),
+            new AxisAlignedBB(0.0D, 0.0D, 0.1875D, 1.0D, 0.0625D, 1.0D),
+            new AxisAlignedBB(0.1875D, 0.0D, 0.0D, 1.0D, 0.0625D, 0.8125D),
+            new AxisAlignedBB(0.1875D, 0.0D, 0.0D, 1.0D, 0.0625D, 1.0D),
+            new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 0.0625D, 0.8125D),
+            new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 0.0625D, 1.0D)};
 
-	public BlockModDust(String name) {
-		super(name, Material.CIRCUITS);
+    public BlockModDust(String name) {
+        super(BlockMod.Builder.create(Material.CIRCUITS), name);
 
-		setDefaultState(blockState.getBaseState()
-				.withProperty(NORTH, EnumAttachPosition.NONE)
-				.withProperty(EAST, EnumAttachPosition.NONE)
-				.withProperty(SOUTH, EnumAttachPosition.NONE)
-				.withProperty(WEST, EnumAttachPosition.NONE));
-		
-		setHardness(0.0F);
-		setSoundType(SoundType.STONE);
-	}
+        setDefaultState(blockState.getBaseState()
+                .withProperty(NORTH, EnumAttachPosition.NONE)
+                .withProperty(EAST, EnumAttachPosition.NONE)
+                .withProperty(SOUTH, EnumAttachPosition.NONE)
+                .withProperty(WEST, EnumAttachPosition.NONE));
 
-	@Override
-	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-		return WIRE_AABB[getAABBIndex(state.getActualState(source, pos))];
-	}
+        setHardness(0.0F);
+        setSoundType(SoundType.STONE);
+    }
 
-	private static int getAABBIndex(IBlockState state) {
-		int i = 0;
-		boolean north = state.getValue(NORTH) != EnumAttachPosition.NONE;
-		boolean east = state.getValue(EAST) != EnumAttachPosition.NONE;
-		boolean south = state.getValue(SOUTH) != EnumAttachPosition.NONE;
-		boolean west = state.getValue(WEST) != EnumAttachPosition.NONE;
+    private static int getAABBIndex(IBlockState state) {
+        int i = 0;
+        boolean north = state.getValue(NORTH) != EnumAttachPosition.NONE;
+        boolean east = state.getValue(EAST) != EnumAttachPosition.NONE;
+        boolean south = state.getValue(SOUTH) != EnumAttachPosition.NONE;
+        boolean west = state.getValue(WEST) != EnumAttachPosition.NONE;
 
-		if(north || south && !north && !east && !west)
-			i |= 1 << EnumFacing.NORTH.getHorizontalIndex();
+        if (north || south && !north && !east && !west)
+            i |= 1 << EnumFacing.NORTH.getHorizontalIndex();
 
-		if(east || west && !north && !east && !south)
-			i |= 1 << EnumFacing.EAST.getHorizontalIndex();
+        if (east || west && !north && !east && !south)
+            i |= 1 << EnumFacing.EAST.getHorizontalIndex();
 
-		if(south || north && !east && !south && !west)
-			i |= 1 << EnumFacing.SOUTH.getHorizontalIndex();
+        if (south || north && !east && !south && !west)
+            i |= 1 << EnumFacing.SOUTH.getHorizontalIndex();
 
-		if(west || east && !north && !south && !west)
-			i |= 1 << EnumFacing.WEST.getHorizontalIndex();
+        if (west || east && !north && !south && !west)
+            i |= 1 << EnumFacing.WEST.getHorizontalIndex();
 
-		return i;
-	}
+        return i;
+    }
 
-	@Override
-	public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos) {
-		state = state.withProperty(WEST, getAttachPosition(worldIn, pos, EnumFacing.WEST));
-		state = state.withProperty(EAST, getAttachPosition(worldIn, pos, EnumFacing.EAST));
-		state = state.withProperty(NORTH, getAttachPosition(worldIn, pos, EnumFacing.NORTH));
-		state = state.withProperty(SOUTH, getAttachPosition(worldIn, pos, EnumFacing.SOUTH));
-		return state;
-	}
+    @Override
+    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+        return WIRE_AABB[getAABBIndex(state.getActualState(source, pos))];
+    }
 
-	protected EnumAttachPosition getAttachPosition(IBlockAccess worldIn, BlockPos pos, EnumFacing direction) {
-		BlockPos blockpos = pos.offset(direction);
-		IBlockState iblockstate = worldIn.getBlockState(pos.offset(direction));
+    @Override
+    public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos) {
+        state = state.withProperty(WEST, getAttachPosition(worldIn, pos, EnumFacing.WEST));
+        state = state.withProperty(EAST, getAttachPosition(worldIn, pos, EnumFacing.EAST));
+        state = state.withProperty(NORTH, getAttachPosition(worldIn, pos, EnumFacing.NORTH));
+        state = state.withProperty(SOUTH, getAttachPosition(worldIn, pos, EnumFacing.SOUTH));
+        return state;
+    }
 
-		if(!canConnectTo(worldIn.getBlockState(blockpos), direction, worldIn, blockpos) && (iblockstate.isNormalCube() || !canConnectUpwardsTo(worldIn, blockpos.down()))) {
-			IBlockState iblockstate1 = worldIn.getBlockState(pos.up());
+    protected EnumAttachPosition getAttachPosition(IBlockAccess worldIn, BlockPos pos, EnumFacing direction) {
+        BlockPos blockpos = pos.offset(direction);
+        IBlockState iblockstate = worldIn.getBlockState(pos.offset(direction));
 
-			if(!iblockstate1.isNormalCube()) {
-				boolean flag = worldIn.getBlockState(blockpos).isSideSolid(worldIn, blockpos, EnumFacing.UP) || worldIn.getBlockState(blockpos).getBlock() == Blocks.GLOWSTONE;
+        if (!canConnectTo(worldIn.getBlockState(blockpos), direction, worldIn, blockpos) && (iblockstate.isNormalCube() || !canConnectUpwardsTo(worldIn, blockpos.down()))) {
+            IBlockState iblockstate1 = worldIn.getBlockState(pos.up());
 
-				if(flag && canConnectUpwardsTo(worldIn, blockpos.up())) {
-					if(iblockstate.isBlockNormalCube())
-						return EnumAttachPosition.UP;
+            if (!iblockstate1.isNormalCube()) {
+                boolean flag = worldIn.getBlockState(blockpos).isSideSolid(worldIn, blockpos, EnumFacing.UP) || worldIn.getBlockState(blockpos).getBlock() == Blocks.GLOWSTONE;
 
-					return EnumAttachPosition.SIDE;
-				}
-			}
+                if (flag && canConnectUpwardsTo(worldIn, blockpos.up())) {
+                    if (iblockstate.isBlockNormalCube())
+                        return EnumAttachPosition.UP;
 
-			return EnumAttachPosition.NONE;
-		}
-		else
-		{
-			return EnumAttachPosition.SIDE;
-		}
-	}
+                    return EnumAttachPosition.SIDE;
+                }
+            }
 
-	@Override
-	public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
-		return null;
-	}
+            return EnumAttachPosition.NONE;
+        } else {
+            return EnumAttachPosition.SIDE;
+        }
+    }
 
-	@Override
-	public boolean isOpaqueCube(IBlockState state) {
-		return false;
-	}
+    @Override
+    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
+        return null;
+    }
 
-	@Override
-	public boolean isFullCube(IBlockState state) {
-		return false;
-	}
+    @Override
+    public boolean isOpaqueCube(IBlockState state) {
+        return false;
+    }
 
-	@Override
-	public boolean canPlaceBlockAt(World worldIn, BlockPos pos) {
-		return worldIn.getBlockState(pos.down()).isTopSolid() || worldIn.getBlockState(pos.down()).getBlock() == Blocks.GLOWSTONE;
-	}
+    @Override
+    public boolean isFullCube(IBlockState state) {
+        return false;
+    }
 
-	@Override
-	public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos) {
-		if(!worldIn.isRemote && !canPlaceBlockAt(worldIn, pos)) {
-			dropBlockAsItem(worldIn, pos, state, 0);
-			worldIn.setBlockToAir(pos);
-		}
-	}
+    @Override
+    public boolean canPlaceBlockAt(World worldIn, BlockPos pos) {
+        return worldIn.getBlockState(pos.down()).isTopSolid() || worldIn.getBlockState(pos.down()).getBlock() == Blocks.GLOWSTONE;
+    }
 
-	protected boolean canConnectUpwardsTo(IBlockAccess worldIn, BlockPos pos) {
-		return canConnectTo(worldIn.getBlockState(pos), null, worldIn, pos);
-	}
+    @Override
+    public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos) {
+        if (!worldIn.isRemote && !canPlaceBlockAt(worldIn, pos)) {
+            dropBlockAsItem(worldIn, pos, state, 0);
+            worldIn.setBlockToAir(pos);
+        }
+    }
 
-	protected boolean canConnectTo(IBlockState blockState, @Nullable EnumFacing side, IBlockAccess world, BlockPos pos) {
-		Block block = blockState.getBlock();
-		return block == this;
-	}
+    protected boolean canConnectUpwardsTo(IBlockAccess worldIn, BlockPos pos) {
+        return canConnectTo(worldIn.getBlockState(pos), null, worldIn, pos);
+    }
 
-	@Override
-	public ItemStack getItem(World worldIn, BlockPos pos, IBlockState state) {
-		return new ItemStack(getItemDropped(state, worldIn.rand, 0));
-	}
+    protected boolean canConnectTo(IBlockState blockState, @Nullable EnumFacing side, IBlockAccess world, BlockPos pos) {
+        Block block = blockState.getBlock();
+        return block == this;
+    }
 
-	@Override
-	public IBlockState getStateFromMeta(int meta)  {
-		return getDefaultState();
-	}
+    @Override
+    public ItemStack getItem(World worldIn, BlockPos pos, IBlockState state) {
+        return new ItemStack(getItemDropped(state, worldIn.rand, 0));
+    }
 
-	@Override
-	public int getMetaFromState(IBlockState state) {
-		return 0;
-	}
+    @Override
+    public IBlockState getStateFromMeta(int meta) {
+        return getDefaultState();
+    }
 
-	@SideOnly(Side.CLIENT)
-	public BlockRenderLayer getBlockLayer() {
-		return BlockRenderLayer.CUTOUT;
-	}
+    @Override
+    public int getMetaFromState(IBlockState state) {
+        return 0;
+    }
 
-	@Override
-	public IBlockState withRotation(IBlockState state, Rotation rot) {
-		switch(rot) {
-		case CLOCKWISE_180:
-			return state.withProperty(NORTH, state.getValue(SOUTH)).withProperty(EAST, state.getValue(WEST)).withProperty(SOUTH, state.getValue(NORTH)).withProperty(WEST, state.getValue(EAST));
-		case COUNTERCLOCKWISE_90:
-			return state.withProperty(NORTH, state.getValue(EAST)).withProperty(EAST, state.getValue(SOUTH)).withProperty(SOUTH, state.getValue(WEST)).withProperty(WEST, state.getValue(NORTH));
-		case CLOCKWISE_90:
-			return state.withProperty(NORTH, state.getValue(WEST)).withProperty(EAST, state.getValue(NORTH)).withProperty(SOUTH, state.getValue(EAST)).withProperty(WEST, state.getValue(SOUTH));
-		default:
-			return state;
-		}
-	}
+    @SideOnly(Side.CLIENT)
+    public BlockRenderLayer getBlockLayer() {
+        return BlockRenderLayer.CUTOUT;
+    }
 
-	@Override
-	public IBlockState withMirror(IBlockState state, Mirror mirrorIn) {
-		switch(mirrorIn) {
-		case LEFT_RIGHT:
-			return state.withProperty(NORTH, state.getValue(SOUTH)).withProperty(SOUTH, state.getValue(NORTH));
-		case FRONT_BACK:
-			return state.withProperty(EAST, state.getValue(WEST)).withProperty(WEST, state.getValue(EAST));
-		default:
-			return super.withMirror(state, mirrorIn);
-		}
-	}
+    @Override
+    public IBlockState withRotation(IBlockState state, Rotation rot) {
+        switch (rot) {
+            case CLOCKWISE_180:
+                return state.withProperty(NORTH, state.getValue(SOUTH)).withProperty(EAST, state.getValue(WEST)).withProperty(SOUTH, state.getValue(NORTH)).withProperty(WEST, state.getValue(EAST));
+            case COUNTERCLOCKWISE_90:
+                return state.withProperty(NORTH, state.getValue(EAST)).withProperty(EAST, state.getValue(SOUTH)).withProperty(SOUTH, state.getValue(WEST)).withProperty(WEST, state.getValue(NORTH));
+            case CLOCKWISE_90:
+                return state.withProperty(NORTH, state.getValue(WEST)).withProperty(EAST, state.getValue(NORTH)).withProperty(SOUTH, state.getValue(EAST)).withProperty(WEST, state.getValue(SOUTH));
+            default:
+                return state;
+        }
+    }
 
-	@Override
-	protected BlockStateContainer createBlockState() {
-		return new BlockStateContainer(this, NORTH, EAST, SOUTH, WEST);
-	}
+    @Override
+    public IBlockState withMirror(IBlockState state, Mirror mirrorIn) {
+        switch (mirrorIn) {
+            case LEFT_RIGHT:
+                return state.withProperty(NORTH, state.getValue(SOUTH)).withProperty(SOUTH, state.getValue(NORTH));
+            case FRONT_BACK:
+                return state.withProperty(EAST, state.getValue(WEST)).withProperty(WEST, state.getValue(EAST));
+            default:
+                return super.withMirror(state, mirrorIn);
+        }
+    }
 
-	@Override
-	public BlockFaceShape getBlockFaceShape(IBlockAccess p_193383_1_, IBlockState p_193383_2_, BlockPos p_193383_3_, EnumFacing p_193383_4_) {
-		return BlockFaceShape.UNDEFINED;
-	}
+    @Override
+    protected BlockStateContainer createBlockState() {
+        return new BlockStateContainer(this, NORTH, EAST, SOUTH, WEST);
+    }
 
-	@Override
-	public Item getItemDropped(IBlockState state, Random rand, int fortune) {
-		return Item.getItemFromBlock(this);
-	}
+    @Override
+    public BlockFaceShape getBlockFaceShape(IBlockAccess p_193383_1_, IBlockState p_193383_2_, BlockPos p_193383_3_, EnumFacing p_193383_4_) {
+        return BlockFaceShape.UNDEFINED;
+    }
 
-	public abstract int getColor(IBlockAccess world, IBlockState state, BlockPos pos, int tint);
+    @Override
+    public Item getItemDropped(IBlockState state, Random rand, int fortune) {
+        return Item.getItemFromBlock(this);
+    }
 
-	@Override
-	public IBlockColor getBlockColor() {
-		return (state, world, pos, tint) -> getColor(world, state, pos, tint);
-	}
+    public abstract int getColor(IBlockAccess world, IBlockState state, BlockPos pos, int tint);
 
-	@Override
-	public IItemColor getItemColor() {
-		return (stack, tint) -> 0xFFFFFF;
-	}
+    @Override
+    public IBlockColor getBlockColor() {
+        return (state, world, pos, tint) -> getColor(world, state, pos, tint);
+    }
 
-	protected enum EnumAttachPosition implements BlockMetaVariants.EnumBase {
+    @Override
+    public IItemColor getItemColor() {
+        return (stack, tint) -> 0xFFFFFF;
+    }
 
-		UP,
-		SIDE,
-		NONE
+    protected enum EnumAttachPosition implements BlockMetaVariants.EnumBase {
 
-	}
+        UP,
+        SIDE,
+        NONE
+
+    }
 
 }

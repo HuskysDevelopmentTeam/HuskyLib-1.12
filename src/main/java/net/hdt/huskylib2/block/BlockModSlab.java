@@ -104,7 +104,7 @@ public abstract class BlockModSlab extends BlockSlab implements IModBlock {
 
     @Override
     public BlockStateContainer createBlockState() {
-        return tempDoubleSlab ? new BlockStateContainer(this, getVariantProp()) : new BlockStateContainer(this, HALF, getVariantProp());
+        return new BlockStateContainer(this, HALF, getVariantProp());
     }
 
     @Override

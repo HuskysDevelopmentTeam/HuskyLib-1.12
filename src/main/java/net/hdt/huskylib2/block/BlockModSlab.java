@@ -1,6 +1,7 @@
 package net.hdt.huskylib2.block;
 
 import net.hdt.huskylib2.interf.IModBlock;
+import net.hdt.huskylib2.interf.IModBlockAlt;
 import net.hdt.huskylib2.item.ItemModBlockSlab;
 import net.hdt.huskylib2.recipe.RecipeHandler;
 import net.hdt.huskylib2.util.ProxyRegistry;
@@ -33,17 +34,18 @@ import java.util.Random;
 
 public abstract class BlockModSlab extends BlockSlab implements IModBlock {
 
+    static boolean tempDoubleSlab;
+
     public static final PropertyEnum prop = PropertyEnum.create("prop", DummyEnum.class);
+
     public static HashMap<BlockModSlab, BlockModSlab> halfSlabs = new HashMap<>();
     public static HashMap<BlockModSlab, BlockModSlab> fullSlabs = new HashMap<>();
-    static boolean tempDoubleSlab;
     boolean doubleSlab;
     private String[] variants;
     private String bareName;
-    private CreativeTabs creativeTabs;
 
     public BlockModSlab(String name, Material materialIn, boolean doubleSlab) {
-        super(hacky(materialIn, doubleSlab));
+        super(materialIn);
 
         this.doubleSlab = doubleSlab;
         if (doubleSlab)
@@ -52,40 +54,11 @@ public abstract class BlockModSlab extends BlockSlab implements IModBlock {
         variants = new String[]{name};
         bareName = name;
 
-        setTranslationKey(getPrefix() + name);
+        setTranslationKey(name);
         if (!doubleSlab) {
             useNeighborBrightness = true;
             setDefaultState(blockState.getBaseState().withProperty(HALF, EnumBlockHalf.BOTTOM).withProperty(prop, DummyEnum.BLARG));
         }
-    }
-
-    public BlockModSlab(Builder properties, String name, boolean doubleSlab) {
-        super(hacky(properties.material, doubleSlab), properties.mapColor);
-
-        this.blockSoundType = properties.soundType;
-        this.lightValue = properties.lightValue;
-        this.blockResistance = properties.resistance;
-        this.blockHardness = properties.hardness;
-        this.needsRandomTick = properties.needsRandomTick;
-        this.slipperiness = properties.slipperiness;
-
-        this.doubleSlab = doubleSlab;
-        if (doubleSlab)
-            name += "_double";
-
-        variants = new String[]{name};
-        bareName = name;
-
-        setTranslationKey(getPrefix() + name);
-        if (!doubleSlab) {
-            useNeighborBrightness = true;
-            setDefaultState(blockState.getBaseState().withProperty(HALF, EnumBlockHalf.BOTTOM).withProperty(prop, DummyEnum.BLARG));
-        }
-    }
-
-    public static Material hacky(Material m, boolean doubleSlab) {
-        tempDoubleSlab = doubleSlab;
-        return m;
     }
 
     public static void initSlab(Block base, int meta, BlockModSlab half, BlockModSlab full) {
@@ -104,7 +77,7 @@ public abstract class BlockModSlab extends BlockSlab implements IModBlock {
 
     @Override
     public BlockStateContainer createBlockState() {
-        return new BlockStateContainer(this, HALF, getVariantProp());
+        return doubleSlab ? new BlockStateContainer(this, getVariantProp()) : new BlockStateContainer(this, HALF, getVariantProp());
     }
 
     @Override
@@ -174,7 +147,12 @@ public abstract class BlockModSlab extends BlockSlab implements IModBlock {
 
     @Override
     public IProperty[] getIgnoredProperties() {
-        return doubleSlab ? new IProperty[]{prop, HALF} : new IProperty[]{prop};
+        return doubleSlab ? new IProperty[] { prop, HALF } : new IProperty[] { prop };
+    }
+
+    @Override
+    public String getTranslationKey(int meta) {
+        return getTranslationKey();
     }
 
     @Override
@@ -215,79 +193,8 @@ public abstract class BlockModSlab extends BlockSlab implements IModBlock {
         return DummyEnum.BLARG;
     }
 
-    public enum DummyEnum implements BlockMetaVariants.EnumBase {
+    public static enum DummyEnum implements BlockMetaVariants.EnumBase {
         BLARG
-    }
-
-    public static class Builder {
-        private Material material;
-        private MapColor mapColor;
-        private SoundType soundType = SoundType.STONE;
-        private int lightValue;
-        private float resistance;
-        private float hardness;
-        private boolean needsRandomTick;
-        private float slipperiness = 0.6F;
-
-        private Builder(Material materialIn, MapColor mapColorIn) {
-            this.material = materialIn;
-            this.mapColor = mapColorIn;
-        }
-
-        public static Builder create(Material materialIn) {
-            return create(materialIn, materialIn.getMaterialMapColor());
-        }
-
-        public static Builder create(Material materialIn, MapColor mapColorIn) {
-            return new Builder(materialIn, mapColorIn);
-        }
-
-        public static Builder from(Block blockIn) {
-            Builder block$builder = new Builder(blockIn.getMaterial(blockIn.getDefaultState()), blockIn.getMaterial(blockIn.getDefaultState()).getMaterialMapColor());
-            block$builder.material = blockIn.getMaterial(blockIn.getDefaultState());
-            block$builder.needsRandomTick = blockIn.getTickRandomly();
-            block$builder.lightValue = blockIn.getLightValue(blockIn.getDefaultState());
-            block$builder.material = blockIn.getMaterial(blockIn.getDefaultState());
-            block$builder.mapColor = blockIn.getMaterial(blockIn.getDefaultState()).getMaterialMapColor();
-            block$builder.soundType = blockIn.getSoundType();
-            return block$builder;
-        }
-
-        public Builder slipperiness(float slipperinessIn) {
-            this.slipperiness = slipperinessIn;
-            return this;
-        }
-
-        protected Builder sound(SoundType soundTypeIn) {
-            this.soundType = soundTypeIn;
-            return this;
-        }
-
-        protected Builder lightValue(int lightValueIn) {
-            this.lightValue = lightValueIn;
-            return this;
-        }
-
-        public Builder hardnessAndResistance(float hardnessIn, float resistanceIn) {
-            this.hardness = hardnessIn;
-            this.resistance = Math.max(0.0F, resistanceIn);
-            return this;
-        }
-
-        protected Builder zeroHardnessAndResistance() {
-            return this.hardnessAndResistance(0.0F);
-        }
-
-        protected Builder hardnessAndResistance(float hardnessAndResistance) {
-            this.hardnessAndResistance(hardnessAndResistance, hardnessAndResistance);
-            return this;
-        }
-
-        protected Builder needsRandomTick() {
-            this.needsRandomTick = true;
-            return this;
-        }
-
     }
 
 }

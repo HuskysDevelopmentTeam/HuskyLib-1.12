@@ -23,7 +23,7 @@ public abstract class ItemMod extends Item implements IVariantHolder {
     private final String bareName;
 
     public ItemMod(String name, String... variants) {
-        setTranslationKey(name);
+        register(name);
         if (variants.length > 1)
             setHasSubtypes(true);
 
@@ -35,24 +35,8 @@ public abstract class ItemMod extends Item implements IVariantHolder {
         variantHolders.add(this);
     }
 
-    @SideOnly(Side.CLIENT)
-    public static void tooltipIfShift(List<String> tooltip, Runnable r) {
-        TooltipHandler.tooltipIfShift(tooltip, r);
-    }
-
-    @SideOnly(Side.CLIENT)
-    public static void addToTooltip(List<String> tooltip, String s, Object... format) {
-        TooltipHandler.addToTooltip(tooltip, s, format);
-    }
-
-    @SideOnly(Side.CLIENT)
-    public static String local(String s) {
-        return TooltipHandler.local(s);
-    }
-
-    @Override
-    public Item setTranslationKey(String name) {
-        super.setTranslationKey(name);
+    public Item register(String name) {
+        setTranslationKey(name);
         setRegistryName(new ResourceLocation(getPrefix() + name));
         ProxyRegistry.register(this);
 

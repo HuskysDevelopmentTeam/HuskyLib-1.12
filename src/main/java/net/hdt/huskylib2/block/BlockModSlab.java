@@ -16,11 +16,10 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -30,11 +29,11 @@ import java.util.Random;
 
 public abstract class BlockModSlab extends BlockSlab implements IModBlock {
 
-    public static final PropertyEnum prop = PropertyEnum.create("prop", DummyEnum.class);
+    private static final PropertyEnum<Variant> VARIANT = PropertyEnum.create("variant", Variant.class);
 
-    public static HashMap<BlockModSlab, BlockModSlab> halfSlabs = new HashMap<>();
-    public static HashMap<BlockModSlab, BlockModSlab> fullSlabs = new HashMap<>();
-    boolean doubleSlab;
+    private static HashMap<BlockModSlab, BlockModSlab> halfSlabs = new HashMap<>();
+    private static HashMap<BlockModSlab, BlockModSlab> fullSlabs = new HashMap<>();
+    private boolean doubleSlab;
     private String[] variants;
     private String bareName;
 
@@ -50,7 +49,7 @@ public abstract class BlockModSlab extends BlockSlab implements IModBlock {
 
         setTranslationKey(name);
 
-        IBlockState iblockstate = this.blockState.getBaseState().withProperty(prop, DummyEnum.BLARG);
+        IBlockState iblockstate = this.blockState.getBaseState().withProperty(VARIANT, Variant.DEFAULT);
 
         if(!this.isDouble()) {
             iblockstate.withProperty(HALF, BlockSlab.EnumBlockHalf.BOTTOM);
@@ -77,23 +76,36 @@ public abstract class BlockModSlab extends BlockSlab implements IModBlock {
     @Override
     public BlockStateContainer createBlockState() {
         if(!this.isDouble()){
-            return new BlockStateContainer(this, HALF);
+            return new BlockStateContainer(this, VARIANT, HALF);
         }
-        return new BlockStateContainer(this, getVariantProp());
+        return new BlockStateContainer(this, VARIANT);
     }
 
     @Override
-    public IBlockState getStateFromMeta(int meta) {
-        if (doubleSlab)
-            return getDefaultState();
-        else return getDefaultState().withProperty(HALF, meta == 8 ? EnumBlockHalf.TOP : EnumBlockHalf.BOTTOM);
+    public final IBlockState getStateFromMeta(final int meta) {
+        IBlockState blockstate = this.blockState.getBaseState().withProperty(VARIANT, Variant.DEFAULT);
+
+        if(!this.isDouble()) {
+            blockstate = blockstate.withProperty(HALF, ((meta & 8) != 0) ? EnumBlockHalf.TOP : EnumBlockHalf.BOTTOM);
+        }
+
+        return blockstate;
     }
 
     @Override
-    public int getMetaFromState(IBlockState state) {
-        if (doubleSlab)
-            return 0;
-        else return state.getValue(HALF) == EnumBlockHalf.TOP ? 8 : 0;
+    public final int getMetaFromState(final IBlockState state) {
+        int meta = 0;
+
+        if(!this.isDouble() && state.getValue(HALF) == EnumBlockHalf.TOP) {
+            meta |= 8;
+        }
+
+        return meta;
+    }
+
+    @Override
+    public IProperty[] getIgnoredProperties() {
+        return new IProperty[0];
     }
 
     public BlockSlab getFullBlock() {
@@ -148,11 +160,6 @@ public abstract class BlockModSlab extends BlockSlab implements IModBlock {
     }
 
     @Override
-    public IProperty[] getIgnoredProperties() {
-        return doubleSlab ? new IProperty[] { prop, HALF } : new IProperty[] { prop };
-    }
-
-    @Override
     public String getTranslationKey(int meta) {
         return getTranslationKey();
     }
@@ -163,40 +170,33 @@ public abstract class BlockModSlab extends BlockSlab implements IModBlock {
     }
 
     @Override
-    public boolean isFullBlock(IBlockState state) {
-        return isDouble();
-    }
-
-    @Override
-    public boolean isSideSolid(IBlockState base_state, IBlockAccess world, BlockPos pos, EnumFacing side) {
-        IBlockState state = getActualState(base_state, world, pos);
-        return isDouble()
-                || (state.getValue(BlockSlab.HALF) == EnumBlockHalf.TOP && side == EnumFacing.UP)
-                || (state.getValue(BlockSlab.HALF) == EnumBlockHalf.BOTTOM && side == EnumFacing.DOWN);
-    }
-
-    @Override
     public IProperty<?> getVariantProp() {
-        return prop;
+        return VARIANT;
     }
 
     @Override
     public IProperty<?> getVariantProperty() {
-        return prop;
+        return VARIANT;
     }
 
     @Override
     public Class getVariantEnum() {
-        return DummyEnum.class;
+        return Variant.class;
     }
 
     @Override
     public Comparable<?> getTypeForItem(ItemStack stack) {
-        return DummyEnum.BLARG;
+        return Variant.DEFAULT;
     }
 
-    public static enum DummyEnum implements BlockMetaVariants.EnumBase {
-        BLARG
+    public enum Variant implements IStringSerializable
+    {
+        DEFAULT;
+
+        @Override
+        public String getName() {
+            return "default";
+        }
     }
 
 }

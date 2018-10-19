@@ -1,21 +1,17 @@
 package net.hdt.huskylib2.block;
 
 import net.hdt.huskylib2.interf.IModBlock;
-import net.hdt.huskylib2.interf.IModBlockAlt;
 import net.hdt.huskylib2.item.ItemModBlockSlab;
 import net.hdt.huskylib2.recipe.RecipeHandler;
 import net.hdt.huskylib2.util.ProxyRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockSlab;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.ItemMeshDefinition;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
@@ -33,8 +29,6 @@ import java.util.HashMap;
 import java.util.Random;
 
 public abstract class BlockModSlab extends BlockSlab implements IModBlock {
-
-    static boolean tempDoubleSlab;
 
     public static final PropertyEnum prop = PropertyEnum.create("prop", DummyEnum.class);
 
@@ -55,10 +49,15 @@ public abstract class BlockModSlab extends BlockSlab implements IModBlock {
         bareName = name;
 
         setTranslationKey(name);
-        if (!doubleSlab) {
-            useNeighborBrightness = true;
-            setDefaultState(blockState.getBaseState().withProperty(HALF, EnumBlockHalf.BOTTOM).withProperty(prop, DummyEnum.BLARG));
+
+        IBlockState iblockstate = this.blockState.getBaseState().withProperty(prop, DummyEnum.BLARG);
+
+        if(!this.isDouble()) {
+            iblockstate.withProperty(HALF, BlockSlab.EnumBlockHalf.BOTTOM);
         }
+
+        this.setDefaultState(iblockstate);
+        this.useNeighborBrightness = !this.isDouble();
     }
 
     public static void initSlab(Block base, int meta, BlockModSlab half, BlockModSlab full) {
@@ -77,7 +76,10 @@ public abstract class BlockModSlab extends BlockSlab implements IModBlock {
 
     @Override
     public BlockStateContainer createBlockState() {
-        return doubleSlab ? new BlockStateContainer(this, getVariantProp()) : new BlockStateContainer(this, HALF, getVariantProp());
+        if(!this.isDouble()){
+            return new BlockStateContainer(this, HALF);
+        }
+        return new BlockStateContainer(this, getVariantProp());
     }
 
     @Override

@@ -3,7 +3,7 @@
     "modid": "huskylib2",
     "name": "HuskyLib-1.12.2",
     "description": "This is my lib mod which I use for my mods",
-    "version": "1.5.1",
+    "version": "1.5.5",
     "mcversion": "[1.12.2, 1.13]",
     "authorList": [
       "HuskyTheArtist"

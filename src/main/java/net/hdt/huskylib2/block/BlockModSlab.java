@@ -51,7 +51,7 @@ public abstract class BlockModSlab extends BlockSlab implements IModBlock {
 
         IBlockState iblockstate = this.blockState.getBaseState().withProperty(VARIANT, Variant.DEFAULT);
 
-        if(!this.isDouble()) {
+        if(!doubleSlab) {
             iblockstate.withProperty(HALF, BlockSlab.EnumBlockHalf.BOTTOM);
         }
 
@@ -75,10 +75,7 @@ public abstract class BlockModSlab extends BlockSlab implements IModBlock {
 
     @Override
     public BlockStateContainer createBlockState() {
-        if(!this.isDouble()){
-            return new BlockStateContainer(this, VARIANT, HALF);
-        }
-        return new BlockStateContainer(this, VARIANT);
+        return isDouble() ? new BlockStateContainer(this, VARIANT) : new BlockStateContainer(this, VARIANT, HALF);
     }
 
     @Override
@@ -124,11 +121,6 @@ public abstract class BlockModSlab extends BlockSlab implements IModBlock {
     @Override
     public Item getItemDropped(IBlockState p_149650_1_, Random p_149650_2_, int p_149650_3_) {
         return Item.getItemFromBlock(getSingleBlock());
-    }
-
-    @Override
-    public int quantityDropped(IBlockState state, int fortune, Random random) {
-        return super.quantityDropped(state, fortune, random);
     }
 
     public void register() {
@@ -189,8 +181,7 @@ public abstract class BlockModSlab extends BlockSlab implements IModBlock {
         return Variant.DEFAULT;
     }
 
-    public enum Variant implements IStringSerializable
-    {
+    public enum Variant implements IStringSerializable {
         DEFAULT;
 
         @Override

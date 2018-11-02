@@ -1,5 +1,8 @@
 package net.hdt.huskylib2.block;
 
+import net.hdt.huskylib2.recipe.RecipeHandler;
+import net.hdt.huskylib2.util.ProxyRegistry;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockSlab;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
@@ -9,10 +12,13 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemSlab;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IStringSerializable;
 import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
+import net.minecraftforge.fml.relauncher.Side;
 
 public abstract class MRSlab extends BlockSlab {
 
@@ -37,12 +43,19 @@ public abstract class MRSlab extends BlockSlab {
         this.useNeighborBrightness = !this.isDouble();
     }
 
-    public void registerItemModel(Item itemBlock) {
-        ModelLoader.setCustomModelResourceLocation(itemBlock, 0, new ModelResourceLocation(name, "inventory"));
-    }
+    public static void registerSlab(Block base, int meta, BlockSlab halfSlab, BlockSlab doubleSlab) {
+        ForgeRegistries.BLOCKS.register(halfSlab);
+        Item halfSlabItem = new ItemSlab(halfSlab, halfSlab, doubleSlab).setRegistryName(halfSlab.getRegistryName());
+        ForgeRegistries.ITEMS.register(halfSlabItem);
 
-    public Item createItemBlock() {
-        return new ItemBlock(this).setRegistryName(getRegistryName());
+        if(FMLCommonHandler.instance().getSide() == Side.CLIENT)
+            ModelLoader.setCustomModelResourceLocation(halfSlabItem, 0, new ModelResourceLocation(halfSlab.getRegistryName(), "inventory"));
+
+        ForgeRegistries.BLOCKS.register(doubleSlab);
+
+        RecipeHandler.addOreDictRecipe(ProxyRegistry.newStack(halfSlab, 6),
+                "BBB",
+                'B', ProxyRegistry.newStack(base, 1, meta));
     }
 
     @Override
@@ -65,7 +78,7 @@ public abstract class MRSlab extends BlockSlab {
         IBlockState blockstate = this.blockState.getBaseState().withProperty(VARIANT, Variant.DEFAULT);
 
         if(!this.isDouble()) {
-            blockstate = blockstate.withProperty(HALF, ((meta&8)!=0)?EnumBlockHalf.TOP:EnumBlockHalf.BOTTOM);
+            blockstate = blockstate.withProperty(HALF, ((meta & 8) !=0) ? EnumBlockHalf.TOP : EnumBlockHalf.BOTTOM);
         }
 
         return blockstate;
@@ -75,7 +88,7 @@ public abstract class MRSlab extends BlockSlab {
     public final int getMetaFromState(final IBlockState state) {
         int meta = 0;
 
-        if(!this.isDouble()&& state.getValue(HALF)==EnumBlockHalf.TOP) {
+        if(!this.isDouble() && state.getValue(HALF) == EnumBlockHalf.TOP) {
             meta |= 8;
         }
 

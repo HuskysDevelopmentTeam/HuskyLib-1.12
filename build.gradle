@@ -9,6 +9,7 @@ buildscript {
     }
 }
 
+apply plugin: 'maven-publish'
 apply plugin: 'java'
 apply plugin: 'net.minecraftforge.gradle.forge'
 
@@ -33,6 +34,7 @@ configurations {
 }
 
 repositories {
+    mavenLocal()
     maven { url = "http://dvs1.progwml6.com/files/maven" }
     maven { url = "http://tehnut.info/maven" }
     maven { url = "http://maven.tterrag.com" }

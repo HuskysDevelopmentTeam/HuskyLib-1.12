@@ -13,7 +13,7 @@ public class HuskyLib {
 
     public static final String MOD_ID = "huskylib2";
     public static final String MOD_NAME = "HuskyLib-1.12.2";
-    static final String VERSION = "1.5.8";
+    static final String VERSION = "1.5.9";
     static final String ACCEPTED_MC_VERSIONS = "[1.12.2, 1.13]";
 
     private static final String PROXY_COMMON = "net.hdt.huskylib2.CommonProxy";

@@ -1,13 +1,3 @@
-/**
- * This class was created by <Vazkii>. It's distributed as
- * part of the Psi Mod. Get the Source Code in github:
- * https://github.com/Vazkii/Psi
- * <p>
- * Psi is Open Source and distributed under the
- * Psi License: http://psi.vazkii.us/license.php
- * <p>
- * File Created @ [11/01/2016, 22:00:30 (GMT)]
- */
 package net.hdt.huskylib2.network;
 
 import io.netty.buffer.ByteBuf;
@@ -24,12 +14,11 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
 
 public abstract class NetworkMessage<REQ extends NetworkMessage> implements Serializable, IMessage, IMessageHandler<REQ, IMessage> {
 
-    private static final HashMap<Class, Pair<Reader, Writer>> handlers = new HashMap();
+    private static final HashMap<Class, Pair<Reader, Writer>> handlers = new HashMap<>();
     private static final HashMap<Class, Field[]> fieldCache = new HashMap<>();
 
     static {
@@ -47,34 +36,86 @@ public abstract class NetworkMessage<REQ extends NetworkMessage> implements Seri
         mapHandler(BlockPos.class, NetworkMessage::readBlockPos, NetworkMessage::writeBlockPos);
     }
 
+    // The thing you override!
+    public IMessage handleMessage(MessageContext context) {
+        return null;
+    }
+
+    @Override
+    public final IMessage onMessage(REQ message, MessageContext context) {
+        return message.handleMessage(context);
+    }
+
+    @Override
+    public final void fromBytes(ByteBuf buf) {
+        try {
+            Class<?> clazz = getClass();
+            Field[] clFields = getClassFields(clazz);
+            for(Field f : clFields) {
+                Class<?> type = f.getType();
+                if(acceptField(f, type))
+                    readField(f, type, buf);
+            }
+        } catch(Exception e) {
+            throw new RuntimeException("Error at reading packet " + this, e);
+        }
+    }
+
+    @Override
+    public final void toBytes(ByteBuf buf) {
+        try {
+            Class<?> clazz = getClass();
+            Field[] clFields = getClassFields(clazz);
+            for(Field f : clFields) {
+                Class<?> type = f.getType();
+                if(acceptField(f, type))
+                    writeField(f, type, buf);
+            }
+        } catch(Exception e) {
+            throw new RuntimeException("Error at writing packet " + this, e);
+        }
+    }
+
     @SuppressWarnings("unlikely-arg-type")
     private static Field[] getClassFields(Class<?> clazz) {
-        if (fieldCache.containsValue(clazz))
+        if(fieldCache.containsValue(clazz))
             return fieldCache.get(clazz);
         else {
             Field[] fields = clazz.getFields();
-            Arrays.sort(fields, Comparator.comparing(Field::getName));
+            Arrays.sort(fields, (Field f1, Field f2) -> {
+                return f1.getName().compareTo(f2.getName());
+            });
             fieldCache.put(clazz, fields);
             return fields;
         }
     }
 
+    private final void writeField(Field f, Class clazz, ByteBuf buf) throws IllegalArgumentException, IllegalAccessException {
+        Pair<Reader, Writer> handler = getHandler(clazz);
+        handler.getRight().write(f.get(this), buf);
+    }
+
+    private final void readField(Field f, Class clazz, ByteBuf buf) throws IllegalArgumentException, IllegalAccessException {
+        Pair<Reader, Writer> handler = getHandler(clazz);
+        f.set(this, handler.getLeft().read(buf));
+    }
+
     private static Pair<Reader, Writer> getHandler(Class<?> clazz) {
         Pair<Reader, Writer> pair = handlers.get(clazz);
-        if (pair == null)
+        if(pair == null)
             throw new RuntimeException("No R/W handler for  " + clazz);
         return pair;
     }
 
     private static boolean acceptField(Field f, Class<?> type) {
         int mods = f.getModifiers();
-        if (Modifier.isFinal(mods) || Modifier.isStatic(mods) || Modifier.isTransient(mods))
+        if(Modifier.isFinal(mods) || Modifier.isStatic(mods) || Modifier.isTransient(mods))
             return false;
 
-        return handlers.containsKey(type);
+        return  handlers.containsKey(type);
     }
 
-    public static <T extends Object> void mapHandler(Class<T> type, Reader<T> reader, Writer<T> writer) {
+    public static <T extends Object>void mapHandler(Class<T> type, Reader<T> reader, Writer<T> writer) {
         handlers.put(type, Pair.of(reader, writer));
     }
 
@@ -159,11 +200,11 @@ public abstract class NetworkMessage<REQ extends NetworkMessage> implements Seri
     }
 
     private static ItemStack readItemStack(ByteBuf buf) {
-        return ByteBufUtils.readItemStack(buf);
+        return new ItemStack(readNBT(buf));
     }
 
     private static void writeItemStack(ItemStack stack, ByteBuf buf) {
-        ByteBufUtils.writeItemStack(buf, stack);
+        writeNBT(stack.serializeNBT(), buf);
     }
 
     private static BlockPos readBlockPos(ByteBuf buf) {
@@ -172,56 +213,6 @@ public abstract class NetworkMessage<REQ extends NetworkMessage> implements Seri
 
     private static void writeBlockPos(BlockPos pos, ByteBuf buf) {
         buf.writeLong(pos.toLong());
-    }
-
-    // The thing you override!
-    public IMessage handleMessage(MessageContext context) {
-        return null;
-    }
-
-    @Override
-    public final IMessage onMessage(REQ message, MessageContext context) {
-        return message.handleMessage(context);
-    }
-
-    @Override
-    public final void fromBytes(ByteBuf buf) {
-        try {
-            Class<?> clazz = getClass();
-            Field[] clFields = getClassFields(clazz);
-            for (Field f : clFields) {
-                Class<?> type = f.getType();
-                if (acceptField(f, type))
-                    readField(f, type, buf);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Error at reading packet " + this, e);
-        }
-    }
-
-    @Override
-    public final void toBytes(ByteBuf buf) {
-        try {
-            Class<?> clazz = getClass();
-            Field[] clFields = getClassFields(clazz);
-            for (Field f : clFields) {
-                Class<?> type = f.getType();
-                if (acceptField(f, type))
-                    writeField(f, type, buf);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Error at writing packet " + this, e);
-        }
-    }
-
-    private void writeField(Field f, Class clazz, ByteBuf buf) throws IllegalArgumentException, IllegalAccessException {
-        Pair<Reader, Writer> handler = getHandler(clazz);
-        handler.getRight().write(f.get(this), buf);
-    }
-
-    private void readField(Field f, Class clazz, ByteBuf buf) throws IllegalArgumentException, IllegalAccessException {
-        Pair<Reader, Writer> handler = getHandler(clazz);
-        f.set(this, handler.getLeft().read(buf));
     }
 
     // Functional interfaces

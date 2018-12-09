@@ -2,20 +2,18 @@ buildscript {
     repositories {
         jcenter()
         maven { url = "http://files.minecraftforge.net/maven" }
-        maven { url = "http://repo.spongepowered.org/maven" }
     }
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
     }
 }
 
-apply plugin: 'maven-publish'
 apply plugin: 'java'
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "${mc_version}-${major_version}.${minor_version}.${build_number}"
-group= "net.hdt.huskylib2"
-archivesBaseName = "HuskyLib"
+version="${mc_version}-${major_version}.${minor_version}.${build_number}"
+group="team.hdt.huskylib"
+archivesBaseName ="${mod_name}"
 
 sourceCompatibility = targetCompatibility = '1.8'
 compileJava {
@@ -28,13 +26,10 @@ minecraft {
     mappings = "${mcp_mappings}"
 }
 
-configurations {
-    embed
-    implementation.extendsFrom(embed)
-}
-
 repositories {
+    mavenCentral()
     mavenLocal()
+    jcenter()
     maven { url = "http://dvs1.progwml6.com/files/maven" }
     maven { url = "http://tehnut.info/maven" }
     maven { url = "http://maven.tterrag.com" }
